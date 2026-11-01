@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>にほん電脳横丁アイコンコンテスト 投票</title>
+<meta name="description" content="作品の中からお気に入りの1作品に投票してください。">
+
+<!-- OGP（Telegram / X などのリンクプレビュー） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="にほん電脳横丁">
+<meta property="og:title" content="にほん電脳横丁アイコンコンテスト投票受付中！">
+<meta property="og:description" content="作品の中からお気に入りの1作品に投票してください。">
+<meta property="og:url" content="https://kintsuba1992.github.io/artwork-vote/">
+<meta property="og:image" content="https://kintsuba1992.github.io/artwork-vote/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="にほん電脳横丁アイコンコンテスト投票受付中！">
+<meta name="twitter:description" content="作品の中からお気に入りの1作品に投票してください。">
+<meta name="twitter:image" content="https://kintsuba1992.github.io/artwork-vote/ogp.png">
+
+<style>
+  :root {
+    --bg: #f7f7f8;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #656d76;
+    --line: #d8dee4;
+    --accent: #2f6feb;
+    --accent-soft: #e8f0fe;
+    --error: #cf222e;
+    --error-soft: #ffebe9;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+  body.no-scroll { overflow: hidden; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 120px; }
+
+  header { text-align: center; margin-bottom: 20px; }
+  h1 { font-size: 1.25rem; margin: 0 0 4px; line-height: 1.4; }
+  .phase-badge {
+    display: inline-block; font-size: .8rem; font-weight: 600;
+    padding: 2px 10px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent); margin-bottom: 8px;
+  }
+  .lead { color: var(--muted); font-size: .9rem; margin: 0; }
+
+  .notice {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 32px 16px; text-align: center;
+  }
+  .notice h2 { font-size: 1.1rem; margin: 0 0 8px; }
+  .notice p { margin: 0 0 16px; color: var(--muted); }
+  .notice p:last-child { margin-bottom: 0; }
+
+  /* 作品グリッド */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+  @media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .card {
+    background: var(--card); border: 2px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; display: flex; flex-direction: column;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .thumb {
+    display: block; width: 100%; aspect-ratio: 1 / 1; padding: 0; border: 0;
+    background: #eef0f2; cursor: zoom-in; position: relative;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .zoom-hint {
+    position: absolute; right: 6px; bottom: 6px; font-size: .7rem; color: #fff;
+    background: rgba(0,0,0,.55); padding: 1px 6px; border-radius: 6px; pointer-events: none;
+  }
+  .pick {
+    display: flex; align-items: flex-start; gap: 8px; padding: 10px; cursor: pointer;
+    flex: 1; min-height: 52px;
+  }
+  .pick input { width: 20px; height: 20px; margin: 2px 0 0; flex-shrink: 0; accent-color: var(--accent); }
+  .pick .meta { min-width: 0; }
+  .pick .no { font-size: .75rem; color: var(--muted); display: block; }
+  .pick .ttl { font-size: .9rem; font-weight: 600; word-break: break-word; display: block; line-height: 1.4; }
+
+  /* ID 入力 */
+  .id-box {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px; margin-top: 20px;
+  }
+  .id-box label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .id-box .req { color: var(--error); font-size: .8rem; margin-left: 4px; }
+  .id-box input {
+    width: 100%; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line);
+    border-radius: 8px; background: #fff; color: var(--text);
+  }
+  .id-box input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .id-box input.invalid { border-color: var(--error); }
+  .id-box .help { font-size: .8rem; color: var(--muted); margin: 6px 0 0; }
+  .rules { font-size: .8rem; color: var(--muted); margin: 12px 0 0; padding-left: 1.2em; }
+
+  .msg {
+    margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: .9rem;
+    background: var(--error-soft); color: var(--error); display: none;
+  }
+  .msg.show { display: block; }
+
+  /* 下部固定バー */
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    background: #fff; border-top: 1px solid var(--line);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  }
+  .bar-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .bar .sel { flex: 1; min-width: 0; font-size: .85rem; color: var(--muted); }
+  .bar .sel strong { color: var(--text); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .btn {
+    font: inherit; font-weight: 600; font-size: .95rem; border-radius: 8px; padding: 10px 18px;
+    border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:disabled { background: #a8b9d8; cursor: not-allowed; }
+  .btn-ghost { background: #fff; color: var(--text); border-color: var(--line); }
+
+  /* モーダル共通 */
+  .overlay {
+    position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.6);
+    display: none; align-items: center; justify-content: center; padding: 16px;
+  }
+  .overlay.open { display: flex; }
+
+  .lightbox-inner { max-width: 640px; width: 100%; text-align: center; }
+  .lightbox-inner img {
+    max-width: 100%; max-height: 70vh; object-fit: contain; display: block; margin: 0 auto;
+    background: #fff; border-radius: 8px;
+  }
+  .lightbox-cap { color: #fff; margin: 10px 0 12px; font-weight: 600; word-break: break-word; }
+  .lightbox-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+  .dialog {
+    background: #fff; border-radius: var(--radius); padding: 20px; max-width: 400px; width: 100%;
+  }
+  .dialog h2 { font-size: 1.05rem; margin: 0 0 12px; }
+  .dialog dl { margin: 0 0 12px; font-size: .9rem; }
+  .dialog dt { color: var(--muted); font-size: .8rem; }
+  .dialog dd { margin: 0 0 8px; font-weight: 600; word-break: break-all; }
+  .dialog .warn { font-size: .85rem; color: var(--error); margin: 0 0 16px; }
+  .dialog-actions { display: flex; gap: 8px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>にほん電脳横丁アイコンコンテスト</h1>
+    <div class="phase-badge" id="phaseBadge" hidden></div>
+    <p class="lead" id="lead">読み込み中…</p>
+  </header>
+
+  <main id="app">
+    <div class="notice" id="loading"><p>読み込み中…</p></div>
+  </main>
+</div>
+
+<!-- 下部固定バー -->
+<div class="bar" id="bar" hidden>
+  <div class="bar-inner">
+    <div class="sel" id="selText">作品を選んでください<strong>未選択</strong></div>
+    <button type="button" class="btn btn-primary" id="submitBtn" disabled>投票する</button>
+  </div>
+</div>
+
+<!-- 拡大表示 -->
+<div class="overlay" id="lightbox" role="dialog" aria-modal="true" aria-label="作品の拡大表示">
+  <div class="lightbox-inner">
+    <img id="lbImg" alt="">
+    <p class="lightbox-cap" id="lbCap"></p>
+    <div class="lightbox-actions">
+      <button type="button" class="btn btn-ghost" id="lbClose">閉じる</button>
+      <button type="button" class="btn btn-primary" id="lbPick">この作品を選ぶ</button>
+    </div>
+  </div>
+</div>
+
+<!-- 送信確認 -->
+<div class="overlay" id="confirm" role="dialog" aria-modal="true" aria-labelledby="cfTitle">
+  <div class="dialog">
+    <h2 id="cfTitle">この内容で投票しますか？</h2>
+    <dl>
+      <dt>作品</dt><dd id="cfWork"></dd>
+      <dt>TelegramID</dt><dd id="cfId"></dd>
+    </dl>
+    <p class="warn">送信後は選び直しできません。</p>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-ghost" id="cfCancel">戻る</button>
+      <button type="button" class="btn btn-primary" id="cfOk">投票する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 設定 ===== */
+  // GAS の makeEncodedUrl() で出力された ENC_API の値を貼り付ける
+  var ENC_API = '';
+  var XOR_KEY = 'yokocho-vote'; // Code.gs と同じキー
+  var IMG_DIR = 'images/';
+  var STORE_PREFIX = 'iconvote_voted_';
+
+  var PHASE_LABEL = { main: '本投票', final: '決選投票' };
+  var ERROR_TEXT = {
+    INVALID_ID: 'TelegramIDの形式が正しくありません（空白は使えません／64文字以内）。',
+    INVALID_WORK: '選択した作品が見つかりません。ページを再読み込みしてください。',
+    ALREADY_VOTED: 'このTelegramIDはすでに投票済みです。',
+    CLOSED: '現在は投票を受け付けていません。',
+    BUSY: 'アクセスが集中しています。少し待ってからもう一度お試しください。',
+    ERROR: 'エラーが発生しました。少し待ってからもう一度お試しください。',
+    NETWORK: '通信に失敗しました。電波状況を確認して、もう一度お試しください。'
+  };
+
+  /* ===== 状態 ===== */
+  var state = { phase: null, works: [], selected: null, sending: false, lbNo: null };
+  var API = decodeApi(ENC_API);
+
+  /* ===== 要素 ===== */
+  var $ = function (id) { return document.getElementById(id); };
+  var app = $('app'), lead = $('lead'), badge = $('phaseBadge');
+  var bar = $('bar'), selText = $('selText'), submitBtn = $('submitBtn');
+  var lightbox = $('lightbox'), lbImg = $('lbImg'), lbCap = $('lbCap');
+  var confirmBox = $('confirm');
+
+  /* ===== ユーティリティ ===== */
+  function decodeApi(enc) {
+    if (!enc) return '';
+    try {
+      var bin = atob(enc), out = '';
+      for (var i = 0; i < bin.length; i++) {
+        out += String.fromCharCode(bin.charCodeAt(i) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length));
+      }
+      return out;
+    } catch (e) { return ''; }
+  }
+
+  function normalizeId(raw) {
+    var s = String(raw || '').trim().replace(/^@+/, '').toLowerCase();
+    if (!s || s.length > 64 || /[\s\u0000-\u001f\u007f]/.test(s)) return '';
+    return s;
+  }
+
+  function storeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function storeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) { /* 保存不可でも続行 */ } }
+
+  function el(tag, attrs, children) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'text') n.textContent = attrs[k];
+      else if (k === 'class') n.className = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    });
+    (children || []).forEach(function (c) { if (c) n.appendChild(c); });
+    return n;
+  }
+
+  /** Fisher-Yates シャッフル（配列をその場で並べ替える） */
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function workLabel(w) { return 'No.' + w.no + (w.title ? '　' + w.title : ''); }
+  function findWork(no) {
+    for (var i = 0; i < state.works.length; i++) if (state.works[i].no === no) return state.works[i];
+    return null;
+  }
+  function imgSrc(w) { return IMG_DIR + encodeURIComponent(w.image); }
+
+  function setScrollLock(on) { document.body.classList.toggle('no-scroll', on); }
+
+  /* ===== 画面表示 ===== */
+  function showNotice(title, text, withReload) {
+    bar.hidden = true;
+    app.innerHTML = '';
+    var box = el('div', { class: 'notice' }, [
+      el('h2', { text: title }),
+      el('p', { text: text })
+    ]);
+    if (withReload) {
+      var b = el('button', { type: 'button', class: 'btn btn-primary', text: '再読み込み' });
+      b.addEventListener('click', function () { location.reload(); });
+      box.appendChild(el('p', null, [b]));
+    }
+    app.appendChild(box);
+  }
+
+  function renderPhase() {
+    if (PHASE_LABEL[state.phase]) {
+      badge.textContent = PHASE_LABEL[state.phase];
+      badge.hidden = false;
+    } else {
+      badge.hidden = true;
+    }
+  }
+
+  function renderVoting() {
+    lead.textContent = state.phase === 'final'
+      ? '決選投票です。上位作品の中からお気に入りの1作品を選んでください。'
+      : '作品の中からお気に入りの1作品を選んで投票してください。';
+
+    app.innerHTML = '';
+    var grid = el('div', { class: 'grid', role: 'radiogroup', 'aria-label': '作品一覧' });
+
+    state.works.forEach(function (w) {
+      var img = el('img', { src: imgSrc(w), alt: workLabel(w), loading: 'lazy', decoding: 'async' });
+      var thumb = el('button', { type: 'button', class: 'thumb', 'aria-label': workLabel(w) + ' を拡大表示' },
+        [img, el('span', { class: 'zoom-hint', text: '拡大' })]);
+      thumb.addEventListener('click', function () { openLightbox(w.no); });
+
+      var radio = el('input', { type: 'radio', name: 'work', value: String(w.no) });
+      radio.addEventListener('change', function () { select(w.no); });
+      var pick = el('label', { class: 'pick' }, [
+        radio,
+        el('span', { class: 'meta' }, [
+          el('span', { class: 'no', text: 'No.' + w.no }),
+          el('span', { class: 'ttl', text: w.title || '（タイトルなし）' })
+        ])
+      ]);
+
+      var card = el('div', { class: 'card', 'data-no': String(w.no) }, [thumb, pick]);
+      grid.appendChild(card);
+    });
+    app.appendChild(grid);
+
+    var idInput = el('input', {
+      type: 'text', id: 'tgId', autocomplete: 'off', autocapitalize: 'off',
+      spellcheck: 'false', maxlength: '65', placeholder: '例：@yokocho_taro', inputmode: 'text'
+    });
+    idInput.addEventListener('input', function () {
+      idInput.classList.remove('invalid');
+      hideMsg();
+    });
+
+    var idBox = el('div', { class: 'id-box' }, [
+      el('label', { for: 'tgId' }, [document.createTextNode('TelegramID'), el('span', { class: 'req', text: '必須' })]),
+      idInput,
+      el('p', { class: 'help', text: '@の有無・大文字小文字は区別しません。' }),
+      el('ul', { class: 'rules' }, [
+        el('li', { text: '投票は1人1回です（同じTelegramIDでは1回のみ）。' }),
+        el('li', { text: '送信後の選び直しはできません。' }),
+        el('li', { text: '投票数は公開されません。' })
+      ]),
+      el('div', { class: 'msg', id: 'msg', role: 'alert' })
+    ]);
+    app.appendChild(idBox);
+
+    bar.hidden = false;
+    updateBar();
+  }
+
+  function select(no) {
+    state.selected = no;
+    var cards = app.querySelectorAll('.card');
+    for (var i = 0; i < cards.length; i++) {
+      var on = Number(cards[i].getAttribute('data-no')) === no;
+      cards[i].classList.toggle('selected', on);
+      var r = cards[i].querySelector('input[type=radio]');
+      if (r) r.checked = on;
+    }
+    hideMsg();
+    updateBar();
+  }
+
+  function updateBar() {
+    var w = state.selected != null ? findWork(state.selected) : null;
+    selText.innerHTML = '';
+    selText.appendChild(document.createTextNode(w ? '選択中' : '作品を選んでください'));
+    selText.appendChild(el('strong', { text: w ? workLabel(w) : '未選択' }));
+    submitBtn.disabled = !w || state.sending;
+    submitBtn.textContent = state.sending ? '送信中…' : '投票する';
+  }
+
+  function showMsg(text) {
+    var m = $('msg'); if (!m) return;
+    m.textContent = text;
+    m.classList.add('show');
+    m.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  function hideMsg() { var m = $('msg'); if (m) { m.textContent = ''; m.classList.remove('show'); } }
+
+  /* ===== 拡大表示 ===== */
+  function openLightbox(no) {
+    var w = findWork(no); if (!w) return;
+    state.lbNo = no;
+    lbImg.src = imgSrc(w);
+    lbImg.alt = workLabel(w);
+    lbCap.textContent = workLabel(w);
+    lightbox.classList.add('open');
+    setScrollLock(true);
+    $('lbClose').focus();
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lbImg.removeAttribute('src');
+    state.lbNo = null;
+    setScrollLock(false);
+  }
+  $('lbClose').addEventListener('click', closeLightbox);
+  $('lbPick').addEventListener('click', function () {
+    var no = state.lbNo;
+    closeLightbox();
+    if (no != null) select(no);
+  });
+  lightbox.addEventListener('click', function (e) { if (e.target === lightbox) closeLightbox(); });
+
+  /* ===== 送信確認 ===== */
+  submitBtn.addEventListener('click', function () {
+    if (state.sending) return;
+    var w = findWork(state.selected);
+    if (!w) { showMsg('作品を1つ選んでください。'); return; }
+
+    var input = $('tgId');
+    var raw = input ? input.value : '';
+    var id = normalizeId(raw);
+    if (!String(raw).trim()) {
+      showMsg('TelegramIDを入力してください。');
+      if (input) { input.classList.add('invalid'); input.scrollIntoView({ block: 'center', behavior: 'smooth' }); input.focus({ preventScroll: true }); }
+      return;
+    }
+    if (!id) {
+      showMsg(ERROR_TEXT.INVALID_ID);
+      if (input) { input.classList.add('invalid'); input.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      return;
+    }
+
+    $('cfWork').textContent = workLabel(w);
+    $('cfId').textContent = '@' + id;
+    confirmBox.classList.add('open');
+    setScrollLock(true);
+    $('cfCancel').focus();
+  });
+
+  function closeConfirm() { confirmBox.classList.remove('open'); setScrollLock(false); }
+  $('cfCancel').addEventListener('click', closeConfirm);
+  confirmBox.addEventListener('click', function (e) { if (e.target === confirmBox && !state.sending) closeConfirm(); });
+  $('cfOk').addEventListener('click', send);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (lightbox.classList.contains('open')) closeLightbox();
+    else if (confirmBox.classList.contains('open') && !state.sending) closeConfirm();
+  });
+
+  /* ===== 送信 ===== */
+  function send() {
+    if (state.sending) return;
+    var w = findWork(state.selected);
+    var id = normalizeId(($('tgId') || {}).value);
+    if (!w || !id) { closeConfirm(); return; }
+
+    state.sending = true;
+    $('cfOk').disabled = true;
+    $('cfCancel').disabled = true;
+    $('cfOk').textContent = '送信中…';
+    updateBar();
+
+    fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ phase: state.phase, no: w.no, id: id })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        finishSending();
+        if (res && res.ok) {
+          storeSet(STORE_PREFIX + state.phase, '1');
+          window.scrollTo(0, 0);
+          showNotice('投票を受け付けました', 'ご投票ありがとうございました！', false);
+          lead.textContent = '';
+          return;
+        }
+        var code = res && res.code;
+        if (code === 'PHASE_CHANGED') {
+          showNotice('投票の段階が切り替わりました', 'ページを再読み込みしてから、もう一度投票してください。', true);
+          return;
+        }
+        if (code === 'CLOSED') {
+          showNotice('受付終了', ERROR_TEXT.CLOSED, false);
+          return;
+        }
+        showMsg(ERROR_TEXT[code] || ERROR_TEXT.ERROR);
+      })
+      .catch(function () {
+        finishSending();
+        showMsg(ERROR_TEXT.NETWORK);
+      });
+  }
+
+  function finishSending() {
+    state.sending = false;
+    $('cfOk').disabled = false;
+    $('cfCancel').disabled = false;
+    $('cfOk').textContent = '投票する';
+    closeConfirm();
+    updateBar();
+  }
+
+  /* ===== 初期化 ===== */
+  function init() {
+    if (!API) {
+      lead.textContent = '';
+      showNotice('準備中', '投票ページの設定が完了していません。', false);
+      return;
+    }
+    fetch(API + (API.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (!res || !res.ok) throw new Error('bad');
+        state.phase = res.phase;
+        state.works = (res.works || []).map(function (w) {
+          return { no: Number(w.no), title: String(w.title || ''), image: String(w.image || '') };
+        });
+        shuffle(state.works); // 並び順による有利不利をなくすため、表示順を毎回ランダムにする
+        renderPhase();
+
+        if (state.phase === 'closed' || !PHASE_LABEL[state.phase]) {
+          lead.textContent = '';
+          showNotice('受付終了', ERROR_TEXT.CLOSED, false);
+          return;
+        }
+        if (storeGet(STORE_PREFIX + state.phase)) {
+          lead.textContent = '';
+          showNotice('投票済みです', 'この端末からはすでに' + PHASE_LABEL[state.phase] + 'に投票済みです。ご協力ありがとうございました！', false);
+          return;
+        }
+        if (!state.works.length) {
+          lead.textContent = '';
+          showNotice('準備中', '作品の準備中です。しばらくお待ちください。', true);
+          return;
+        }
+        renderVoting();
+      })
+      .catch(function () {
+        lead.textContent = '';
+        showNotice('読み込みに失敗しました', '電波状況を確認して、再読み込みしてください。', true);
+      });
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
